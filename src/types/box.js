@@ -27,6 +27,19 @@ module.exports = function(Chart) {
 			if (xScale) {
 				min = helpers.isValid(options.xMin) ? options.xMin : xScale.getValueForPixel(chartArea.left);
 				max = helpers.isValid(options.xMax) ? options.xMax : xScale.getValueForPixel(chartArea.right);
+				if (!helpers.isValid(options.xMax)) {
+	          		var maxXValue = 0;
+	          		chartInstance.config.data.datasets.forEach((dataset) => {
+	            		dataset.data.forEach((point) => {
+	              			maxXValue = point.x > maxXValue ? point.x : maxXValue;
+	            		});
+	          		});
+
+	          		// left border is bigger than max point
+	          		if (min > xScale.getValueForPixel(maxXValue)) {
+	            		max = Math.ceil(maxXValue / 10) * 10;
+	          		}
+        		}
 
 				model.ranges[options.xScaleID] = {
 					min: Math.min(min, max),
